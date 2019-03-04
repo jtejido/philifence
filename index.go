@@ -110,7 +110,7 @@ func LoadIndex(dir string) (fences FenceIndex, err error) {
 	fences = NewFenceIndex()
 	for _, path := range paths {
 		key := sluggify(path)
-		info("Putting up fence %q from %s\n", key, path)
+		info("Indexing %q from %s\n", key, path)
 		fence, err := NewFence()
 		if err != nil {
 			fatal("Error building fence for %q, skipping...", key)
