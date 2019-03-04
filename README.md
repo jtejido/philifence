@@ -1,4 +1,5 @@
 # philifence
+![openstreetmap](http://2.bp.blogspot.com/-xanwG0Mtg18/UjhzWnBWQDI/AAAAAAAAR-c/GTA4EgA1GKg/s1600/ianlopez_temp.jpg=250x250)
 
 PhiliFence is a GeoFencing and Route-listing REST-API service, aimed at finding the boundary (district boundaries as defined by [GADM](https://gadm.org/) and national roads (as defined by [OSM](https://www.openstreetmap.org/about)) from a given location and boundary tolerance.
 
