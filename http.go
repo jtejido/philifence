@@ -13,7 +13,7 @@ import (
 var fences, roads FenceIndex
 
 func ListenAndServe(addr string, fidx, ridx FenceIndex, profile bool) error {
-	info("Fencing on address %s\n", addr)
+	info("Listening on %s\n", addr)
 	defer info("Done Fencing\n")
 	fences = fidx
 	roads = ridx

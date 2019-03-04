@@ -51,7 +51,7 @@ $ ./cli -port=8383
 2019/03/04 21:12:11 INFO: Loaded 1647 features for "philippine-cities"
 2019/03/04 21:12:11 INFO: Indexing "philippine-roads" from ../osm_philippine_roads_wgs84_2012/philippine_roads.json
 2019/03/04 21:12:31 INFO: Loaded 276780 features for "philippine-roads"
-2019/03/04 21:12:31 INFO: Fencing on address :8383
+2019/03/04 21:12:31 INFO: Listening on :8383
 ```
 
 ### Using the Service:
