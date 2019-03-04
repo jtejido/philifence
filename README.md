@@ -47,9 +47,9 @@ Simply starting the service should index all geojson from a given path.
 ```bash
 $ ./cli -port=8383
 2019/03/04 21:12:10 Starting PhiliFence
-2019/03/04 21:12:10 INFO: Putting up fence "philippine-cities" from ../gadm_philippine_cities_wgs84_v2/philippine_cities.json
+2019/03/04 21:12:10 INFO: Indexing "philippine-cities" from ../gadm_philippine_cities_wgs84_v2/philippine_cities.json
 2019/03/04 21:12:11 INFO: Loaded 1647 features for "philippine-cities"
-2019/03/04 21:12:11 INFO: Putting up fence "philippine-roads" from ../osm_philippine_roads_wgs84_2012/philippine_roads.json
+2019/03/04 21:12:11 INFO: Indexing "philippine-roads" from ../osm_philippine_roads_wgs84_2012/philippine_roads.json
 2019/03/04 21:12:31 INFO: Loaded 276780 features for "philippine-roads"
 2019/03/04 21:12:31 INFO: Fencing on address :8383
 ```
@@ -101,7 +101,7 @@ POST json at http://localhost:8181/road/{name}/add
 ## To-Do:
 
 1. Object insertion at a given fence (e.g., nearest restaurants within query's fence boundary).
-2. Objects within roads A.K.A. actual best-route-finding stuff. (Isoline routing, etc.).
+2. Objects within roads & actual best-route-finding stuff. (Isoline routing, etc.).
 3. Merge.
 4. K-NearestNeighbours inside a fence (see [Geodesy-PHP](https://github.com/jtejido/geodesy-php)).
 5. G-NearestNeighbours.
