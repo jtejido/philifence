@@ -1,7 +1,7 @@
 # philifence
 ![openstreetmap](http://2.bp.blogspot.com/-xanwG0Mtg18/UjhzWnBWQDI/AAAAAAAAR-c/GTA4EgA1GKg/s1600/ianlopez_temp.jpg=250x250)
 
-PhiliFence is a GeoFencing and Route-listing REST-API service, aimed at finding the boundary (district boundaries as defined by [GADM](https://gadm.org/) and national roads (as defined by [OSM](https://www.openstreetmap.org/about)) from a given location and boundary tolerance.
+PhiliFence is a GeoFencing and Route-listing REST-API service, aimed at finding the boundary (district boundaries as defined by [GADM](https://gadm.org/)) and national roads (as defined by [OSM](https://www.openstreetmap.org/about)) from a given location and boundary tolerance.
 
 This aims (though not in due time...I think...) to be a complete [route-finding](https://wiki.openstreetmap.org/wiki/OpenRouteService) and [geo-fencing](https://mediavision2020.com/25-top-geofencing-companies/) in-memory service aimed at systems providing geo-push notifications (geo-targeted marketing (Facebook's promoted ads, Spatially, ThinkNear, etc.), notifications at location-enter/exit (Apple's Notifications), proximity alert (ProximiT), Uber/Lyft-like driver push notifications on users searching for cars, Child-location services (when kids left a location), location-based SMS (NDRRMC, Seismic/Atmospheric location-related events), Content Localization (Netflix's geographic restriction), etc.), and of course, route-finding.
 
