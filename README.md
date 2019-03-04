@@ -62,7 +62,6 @@ $ ./cli -port=8383
 ```
 http://localhost:8181/fence/philippine-cities/search?lat=10.2925&lon=123.9056
 http://localhost:8181/fence/philippine-cities/search?lat=10.2925&lon=123.9056&tolerance=1
-
 ```
 
 ***Get roads that intersects a given location (e.g., as a user in Elliptical Road, Q.C.)***
@@ -70,10 +69,9 @@ http://localhost:8181/fence/philippine-cities/search?lat=10.2925&lon=123.9056&to
 ```
 http://localhost:8181/road/philippine-roads/search?lat=14.6503&lon=121.0520
 http://localhost:8181/road/philippine-roads/search?lat=14.6503&lon=121.0520&tolerance=10
-
 ```
 
-*note: **tolerance** is the bounding box around the given point, this value is in meters (it creates a bounded box around the point)*
+**note:** tolerance is the bounding box around the given point, this value is in meters (it creates a bounded box around the point)
 
 ***Load All fence indices***
 
