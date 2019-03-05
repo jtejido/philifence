@@ -5,9 +5,11 @@ PhiliFence is a GeoFencing and Route-listing REST-API service, aimed at finding 
 
 This aims (though not in due time...I think...) to be a complete [route-finding](https://wiki.openstreetmap.org/wiki/OpenRouteService) and [geo-fencing](https://mediavision2020.com/25-top-geofencing-companies/) in-memory service aimed at systems providing geo-push notifications (geo-targeted marketing (Facebook's promoted ads, Spatially, ThinkNear, etc.), notifications at location-enter/exit (Apple's Notifications), proximity alert (ProximiT), Uber/Lyft-like driver push notifications on users searching for cars, Child-location services (when kids left a location), location-based SMS (NDRRMC, Seismic/Atmospheric location-related events), Content Localization (Netflix's geographic restriction), etc.), and of course, route-finding.
 
-This makes use of an R-Tree variant called a [Hilbert R-Tree](https://en.wikipedia.org/wiki/Hilbert_R-tree) for geometrical indexing, which provides better coordinate ordering, and thus, better compression.
+This makes use of an R-Tree variant called a [Hilbert R-Tree](https://en.wikipedia.org/wiki/Hilbert_R-tree) for geometrical indexing, which provides better ordering of multidimensional objects in the node by employing what's called a [Hilbert space-filling curve](https://en.wikipedia.org/wiki/Hilbert_curve).
 
-Currently, I have a [not-so-updated](http://philgis.org/general-country-datasets/country-basemaps) administrative boundaries and national roads data, but is API-ready for adding new fences and roads as needed.
+Given its ordered nature, deferred splitting is possible (while other R-Tree variants cannot), thus, achieving ~100% space utilization.
+
+Currently, I have a [not-so-updated](http://philgis.org/general-country-datasets/country-basemaps) administrative boundaries and national roads data, but is API-ready for adding new fences and roads as needed. In fact, you can download them yourselves from the sources mentioned above, but be warned that not all of them are encoded properly, while other vertices aren't actually snapped (needed a lot of fixing on shape files).
 
 
 ## Usage:
