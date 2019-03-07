@@ -1,29 +1,37 @@
 package philifence
 
-type Polygon struct {
+type PolyRing struct {
 	Coordinates []Coordinate
 }
 
-func MakePoly(length int) *Polygon {
-	return &Polygon{Coordinates: make([]Coordinate, length)}
+func MakePolyRing(length int) *PolyRing {
+	return &PolyRing{
+		Coordinates: make([]Coordinate, length),
+	}
 }
 
-func NewPoly(coords ...Coordinate) *Polygon {
-	return &Polygon{Coordinates: coords}
+func NewPolyRing(coords ...Coordinate) *PolyRing {
+	return &PolyRing{
+		Coordinates: coords,
+	}
 }
 
-func (poly *Polygon) Add(c ...Coordinate) {
-	poly.Coordinates = append(poly.Coordinates, c...)
+func (pr *PolyRing) Add(c ...Coordinate) {
+	pr.Coordinates = append(pr.Coordinates, c...)
 }
 
-func (poly *Polygon) computeBox() Box {
+func (pr *PolyRing) Len() int {
+	return len(pr.Coordinates)
+}
+
+func (pr *PolyRing) computeBox() Box {
 
 	var min, max Coordinate
-	for i := 0; i < len(poly.Coordinates); i++ {
+	for i := 0; i < len(pr.Coordinates); i++ {
 		if i == 0 {
-			min, max = poly.Coordinates[0], poly.Coordinates[0]
+			min, max = pr.Coordinates[0], pr.Coordinates[0]
 		} else {
-			c := poly.Coordinates[i]
+			c := pr.Coordinates[i]
 			if c.lat < min.lat {
 				min.lat = c.lat
 			}
@@ -44,22 +52,8 @@ func (poly *Polygon) computeBox() Box {
 
 }
 
-func (poly *Polygon) Contains(c Coordinate) bool {
-	return poly.computeWindingNumber(c) != 0
-}
-
-func (poly *Polygon) reverse() {
-	for i, j := 0, len(poly.Coordinates)-1; i < j; i, j = i+1, j-1 {
-		poly.Coordinates[i], poly.Coordinates[j] = poly.Coordinates[j], poly.Coordinates[i]
-	}
-}
-
-func (poly *Polygon) Len() int {
-	return len(poly.Coordinates)
-}
-
-func (poly *Polygon) isClockwise() bool {
-	coords := poly.Coordinates
+func (pr *PolyRing) isClockwise() bool {
+	coords := pr.Coordinates
 	sum := 0.0
 	for i, coord := range coords[:len(coords)-1] {
 		next := coords[i+1]
@@ -69,18 +63,18 @@ func (poly *Polygon) isClockwise() bool {
 	return sum >= 0
 }
 
-func (poly *Polygon) computeWindingNumber(q Coordinate) (wn int) {
+func (pr *PolyRing) computeWindingNumber(q Coordinate) (wn int) {
 
-	for i := range poly.Coordinates[:poly.Len()-1] {
-		if poly.Coordinates[i].Lat() <= q.Lat() {
-			if poly.Coordinates[i+1].Lat() > q.Lat() {
-				if isLeft(poly.Coordinates[i], poly.Coordinates[i+1], q) > 0 {
+	for i := range pr.Coordinates[:pr.Len()-1] {
+		if pr.Coordinates[i].Lat() <= q.Lat() {
+			if pr.Coordinates[i+1].Lat() > q.Lat() {
+				if isLeft(pr.Coordinates[i], pr.Coordinates[i+1], q) > 0 {
 					wn++
 				}
 			}
 		} else {
-			if poly.Coordinates[i+1].Lat() <= q.Lat() {
-				if isLeft(poly.Coordinates[i], poly.Coordinates[i+1], q) < 0 {
+			if pr.Coordinates[i+1].Lat() <= q.Lat() {
+				if isLeft(pr.Coordinates[i], pr.Coordinates[i+1], q) < 0 {
 					wn--
 				}
 			}
@@ -88,6 +82,57 @@ func (poly *Polygon) computeWindingNumber(q Coordinate) (wn int) {
 	}
 
 	return
+}
+
+type Polygon struct {
+	Coordinates *PolyRing
+	Holes []*PolyRing
+}
+
+func MakePoly(length int) *Polygon {
+	return &Polygon{
+		Coordinates: MakePolyRing(length),
+	}
+}
+
+func NewPoly(coords ...Coordinate) *Polygon {
+	return &Polygon{
+		Coordinates: NewPolyRing(coords...),
+	}
+}
+
+func (poly *Polygon) Add(c ...Coordinate) {
+	poly.Coordinates.Add(c...)
+}
+
+func (poly *Polygon) computeBox() Box {
+	return poly.Coordinates.computeBox()
+}
+
+func (poly *Polygon) Contains(c Coordinate) (ok bool) {
+	ok = poly.Coordinates.computeWindingNumber(c) != 0
+
+	if ok && poly.Holes != nil {
+		// if point is in poly but inside a hole, then return false
+		for _, h := range poly.Holes {
+			if h.computeWindingNumber(c) != 0 {
+				ok = false
+				break
+			}
+		}
+	}
+
+	return
+}
+
+// func (poly *Polygon) reverse() {
+// 	for i, j := 0, len(poly.Coordinates)-1; i < j; i, j = i+1, j-1 {
+// 		poly.Coordinates[i], poly.Coordinates[j] = poly.Coordinates[j], poly.Coordinates[i]
+// 	}
+// }
+
+func (poly *Polygon) Len() int {
+	return poly.Coordinates.Len()
 }
 
 func isLeft(h, t, q Coordinate) float64 {

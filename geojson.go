@@ -58,38 +58,12 @@ func featureAdapter(gj *geojson.Feature) (feature *Feature, err error) {
 			feature.AddPoly(poly)
 		}
 	case *geojson.Polygon:
-		exterior := true
-		for _, line := range geom.Coordinates {
-			poly := coordinatesAdapter(line)
-			if exterior {
-				if !poly.isClockwise() {
-					poly.reverse()
-				}
-				exterior = false
-			} else {
-				if poly.isClockwise() {
-					poly.reverse()
-				}
-			}
-			feature.AddPoly(poly)
-		}
+		poly := multilineAdapter(geom.Coordinates)
+		feature.AddPoly(poly)
 	case *geojson.MultiPolygon:
 		for _, multiline := range geom.Coordinates {
-			exterior := true
-			for _, line := range multiline {
-				poly := coordinatesAdapter(line)
-				if exterior {
-					if !poly.isClockwise() {
-						poly.reverse()
-					}
-					exterior = false
-				} else {
-					if poly.isClockwise() {
-						poly.reverse()
-					}
-				}
-				feature.AddPoly(poly)
-			}
+			poly := multilineAdapter(multiline)
+			feature.AddPoly(poly)
 		}
 	default:
 		feature = nil
@@ -105,12 +79,43 @@ func unmarshalFeature(raw string) (feature *geojson.Feature, err error) {
 
 func coordinatesAdapter(line geojson.Coordinates) (poly *Polygon) {
 	poly = MakePoly(len(line))
+
 	for i, point := range line {
 		lat := float64(point[1])
 		lon := float64(point[0])
 		coord := Coordinate{lat: lat, lon: lon}
-		poly.Coordinates[i] = coord
+		poly.Coordinates.Coordinates[i] = coord
 	}
+
+	return
+}
+
+func multilineAdapter(coordinates geojson.MultiLine) (poly *Polygon) {
+	// first is the exterior ring
+	exterior := true
+	ctr := 0
+	for _, line := range coordinates {
+		if exterior {
+			poly = coordinatesAdapter(line)
+			exterior = false
+		} else {
+			if poly.Holes == nil {
+				poly.Holes = make([]*PolyRing, len(coordinates))
+			}
+			if poly.Holes[ctr] == nil {
+				poly.Holes[ctr] = MakePolyRing(len(line))
+			}
+			for i, point := range line {
+				lat := float64(point[1])
+				lon := float64(point[0])
+				coord := Coordinate{lat: lat, lon: lon}
+				poly.Holes[ctr].Coordinates[i] = coord
+			}
+
+			ctr++
+		}
+	}
+
 	return
 }
 
