@@ -113,7 +113,7 @@ func LoadIndex(dir string) (fences FenceIndex, err error) {
 		info("Indexing %q from %s\n", key, path)
 		fence, err := NewFence()
 		if err != nil {
-			fatal("Error building fence for %q, skipping...", key)
+			fatal("Error building fence for %q. ERROR: %v", key, err)
 			continue
 		}
 		source := NewSource(path)

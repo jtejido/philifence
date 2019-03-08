@@ -1,18 +1,20 @@
 package philifence
 
+import "github.com/jtejido/hrtree"
+
 var (
-	MinimumNodeChildren        = DefaultMinNodeEntries
-	MaximumNodeChildren        = DefaultMaxNodeEntries
-	Resolution                 = DefaultResolution
+	MinimumNodeChildren        = 50
+	MaximumNodeChildren        = 200
+	Resolution                 = 32 // 64-bit resolution for hilbert curve
 	dim                 uint64 = 1 << (uint(Resolution) - 1)
 )
 
 type Rtree struct {
-	rtree *HRtree
+	rtree *hrtree.HRtree
 }
 
 func NewRtree() (*Rtree, error) {
-	rt, err := NewTree(MinimumNodeChildren, MaximumNodeChildren, Resolution)
+	rt, err := hrtree.NewTree(MinimumNodeChildren, MaximumNodeChildren, Resolution)
 
 	return &Rtree{
 		rtree: rt,
@@ -28,7 +30,7 @@ func (r *Rtree) Insert(s *Polygon, data interface{}) {
 	r.rtree.Insert(node)
 }
 
-func (r *Rtree) intersections(q Rectangle) []*customRect {
+func (r *Rtree) intersections(q hrtree.Rectangle) []*customRect {
 	inodes := r.rtree.SearchIntersect(q)
 
 	nodes := make([]*customRect, len(inodes))
@@ -64,12 +66,12 @@ func (n *customRect) Value() interface{} {
 }
 
 // implements Rectangle
-func (n *customRect) LowerLeft() Point {
-	return Point{lonToUint32(n.box.min.lon), latToUint32(n.box.min.lat)}
+func (n *customRect) LowerLeft() hrtree.Point {
+	return hrtree.Point{lonToUint32(n.box.min.lon), latToUint32(n.box.min.lat)}
 }
 
-func (n *customRect) UpperRight() Point {
-	return Point{lonToUint32(n.box.max.lon), latToUint32(n.box.max.lat)}
+func (n *customRect) UpperRight() hrtree.Point {
+	return hrtree.Point{lonToUint32(n.box.max.lon), latToUint32(n.box.max.lat)}
 }
 
 // ensure the limit is within -180, 180
