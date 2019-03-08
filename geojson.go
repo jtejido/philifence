@@ -44,17 +44,17 @@ func featureAdapter(gj *geojson.Feature) (feature *Feature, err error) {
 	feature.Type = igeom.GetType()
 	switch geom := igeom.(type) {
 	case *geojson.Point:
-		poly := coordinatesAdapter(geojson.Coordinates{geom.Coordinates})
+		poly := exteriorAdapter(geojson.Coordinates{geom.Coordinates})
 		feature.AddPoly(poly)
 	case *geojson.LineString:
-		poly := coordinatesAdapter(geom.Coordinates)
+		poly := exteriorAdapter(geom.Coordinates)
 		feature.AddPoly(poly)
 	case *geojson.MultiPoint:
-		poly := coordinatesAdapter(geom.Coordinates)
+		poly := exteriorAdapter(geom.Coordinates)
 		feature.AddPoly(poly)
 	case *geojson.MultiLineString:
 		for _, line := range geom.Coordinates {
-			poly := coordinatesAdapter(line)
+			poly := exteriorAdapter(line)
 			feature.AddPoly(poly)
 		}
 	case *geojson.Polygon:
@@ -77,39 +77,48 @@ func unmarshalFeature(raw string) (feature *geojson.Feature, err error) {
 	return
 }
 
-func coordinatesAdapter(line geojson.Coordinates) (poly *Polygon) {
-	poly = MakePoly(len(line))
-
+func coordinateAdapter(line geojson.Coordinates, ring *PolyRing) {
 	for i, point := range line {
 		lat := float64(point[1])
 		lon := float64(point[0])
 		coord := Coordinate{lat: lat, lon: lon}
-		poly.Coordinates.Coordinates[i] = coord
+		ring.Coordinates[i] = coord
 	}
+}
 
+func exteriorAdapter(line geojson.Coordinates) (poly *Polygon) {
+	poly = MakePoly(len(line))
+	coordinateAdapter(line, poly.Coordinates)
 	return
 }
 
 func multilineAdapter(coordinates geojson.MultiLine) (poly *Polygon) {
-	// first is the exterior ring
+	
 	exterior := true
 	ctr := 0
 	for _, line := range coordinates {
 		if exterior {
-			poly = coordinatesAdapter(line)
+			// first is the exterior ring
+			poly = exteriorAdapter(line)
+			// https://tools.ietf.org/html/rfc7946#section-3.1.6
+			if poly.Coordinates.isClockwise() {
+				poly.Coordinates.reverse()
+			}
+
 			exterior = false
 		} else {
 			if poly.Holes == nil {
 				poly.Holes = make([]*PolyRing, len(coordinates))
 			}
+
 			if poly.Holes[ctr] == nil {
 				poly.Holes[ctr] = MakePolyRing(len(line))
 			}
-			for i, point := range line {
-				lat := float64(point[1])
-				lon := float64(point[0])
-				coord := Coordinate{lat: lat, lon: lon}
-				poly.Holes[ctr].Coordinates[i] = coord
+			
+			coordinateAdapter(line, poly.Holes[ctr])
+
+			if !poly.Holes[ctr].isClockwise() {
+				poly.Holes[ctr].reverse()
 			}
 
 			ctr++
@@ -117,6 +126,7 @@ func multilineAdapter(coordinates geojson.MultiLine) (poly *Polygon) {
 	}
 
 	return
+
 }
 
 func readGeoJson(path string) (features *geojson.FeatureCollection, err error) {

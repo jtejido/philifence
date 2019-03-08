@@ -2,7 +2,6 @@ package philifence
 
 import (
 	"fmt"
-	//"math"
 	"strings"
 )
 
