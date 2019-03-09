@@ -88,7 +88,7 @@ func coordinateAdapter(line geojson.Coordinates, ring *PolyRing) {
 
 func exteriorAdapter(line geojson.Coordinates) (poly *Polygon) {
 	poly = MakePoly(len(line))
-	coordinateAdapter(line, poly.Coordinates)
+	coordinateAdapter(line, poly.Exterior)
 	return
 }
 
@@ -101,8 +101,8 @@ func multilineAdapter(coordinates geojson.MultiLine) (poly *Polygon) {
 			// first is the exterior ring
 			poly = exteriorAdapter(line)
 			// https://tools.ietf.org/html/rfc7946#section-3.1.6
-			if poly.Coordinates.isClockwise() {
-				poly.Coordinates.reverse()
+			if poly.Exterior.isClockwise() {
+				poly.Exterior.reverse()
 			}
 
 			exterior = false

@@ -108,5 +108,5 @@ POST json at http://localhost:8383/road/{name}/add
 4. K-NearestNeighbours inside a fence (see [Geodesy-PHP](https://github.com/jtejido/geodesy-php)).
 5. G-NearestNeighbours.
 6. Data Persistence and Data reload on-start
-7. Scalable, Distributed type ([SD-Rtree](http://cedric.cnam.fr/~dumouza/EnsPubli/icde07.pdf) implem. on Hilbert RTree?).
+7. Scalable, Distributed R-Tree ([SD-Rtree](http://cedric.cnam.fr/~dumouza/EnsPubli/icde07.pdf) implem. on Hilbert RTree?).
 8. Tests.

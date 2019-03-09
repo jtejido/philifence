@@ -10,8 +10,8 @@ func TestReversePolygon(t *testing.T) {
 		c := Coordinate{f, f}
 		poly.Add(c)
 	}
-	poly.reverse()
-	for i, c := range poly.Coordinates {
+	poly.Exterior.reverse()
+	for i, c := range poly.Exterior.Coordinates {
 		if vals[i] != c.lat {
 			t.Errorf("Polygon was not reversed %v", poly)
 		}
@@ -27,11 +27,11 @@ func TestClockwise(t *testing.T) {
 		{39.7435437641, -105.003612041},
 	}
 	poly := NewPoly(rcw...)
-	if poly.isClockwise() {
+	if poly.Exterior.isClockwise() {
 		t.Errorf("Polygon is clockwise %v", poly)
 	}
-	poly.reverse()
-	if !poly.isClockwise() {
+	poly.Exterior.reverse()
+	if !poly.Exterior.isClockwise() {
 		t.Errorf("Polygon is not clockwise %v", poly)
 	}
 }

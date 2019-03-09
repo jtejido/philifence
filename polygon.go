@@ -128,24 +128,24 @@ func (pr *PolyRing) isClockwise() bool {
 }
 
 type Polygon struct {
-	Coordinates *PolyRing
+	Exterior *PolyRing
 	Holes []*PolyRing
 }
 
 func MakePoly(length int) *Polygon {
-	return &Polygon{Coordinates: MakePolyRing(length)}
+	return &Polygon{Exterior: MakePolyRing(length)}
 }
 
 func NewPoly(coords ...Coordinate) *Polygon {
-	return &Polygon{Coordinates: NewPolyRing(coords...)}
+	return &Polygon{Exterior: NewPolyRing(coords...)}
 }
 
 func (poly *Polygon) Add(c ...Coordinate) {
-	poly.Coordinates.Add(c...)
+	poly.Exterior.Add(c...)
 }
 
 func (poly *Polygon) Contains(c Coordinate) (ok bool) {
-	ok = poly.Coordinates.computeWindingNumber(c) != 0
+	ok = poly.Exterior.computeWindingNumber(c) != 0
 
 	if ok {
 		for _, hole := range poly.Holes {
@@ -160,11 +160,11 @@ func (poly *Polygon) Contains(c Coordinate) (ok bool) {
 }
 
 func (poly *Polygon) Len() int {
-	return poly.Coordinates.Len()
+	return poly.Exterior.Len()
 }
 
 func (poly *Polygon) computeBox() Box {
-	return poly.Coordinates.computeBox()
+	return poly.Exterior.computeBox()
 }
 
 // rectangle wrapper for polygon

@@ -1,12 +1,21 @@
 package philifence
 
-import "github.com/jtejido/hrtree"
+import (
+	"github.com/jtejido/hrtree"
+	"math"
+)
 
 var (
 	MinimumNodeChildren        = 50
 	MaximumNodeChildren        = 200
 	Resolution                 = 32 // 64-bit resolution for hilbert curve
 	dim                 uint64 = 1 << (uint(Resolution) - 1)
+)
+
+const (
+	earthRadius = 6371e3 // assume WGS84?
+	radians     = math.Pi / 180
+	degrees     = 180 / math.Pi
 )
 
 type Rtree struct {
@@ -42,11 +51,7 @@ func (r *Rtree) intersections(q hrtree.Rectangle) []*customRect {
 }
 
 func (r *Rtree) Contains(c Coordinate, tol float64) []*customRect {
-	tol = tol / 100000.0 // no limit at this point
-	lower := Coordinate{lon: c.lon - tol, lat: c.lat - tol}
-	upper := Coordinate{lon: c.lon + tol, lat: c.lat + tol}
-	poly := NewPoly(lower, upper)
-	q := &customRect{polygon: poly, box: poly.computeBox()}
+	q := rectFromCenter(c, tol)
 	return r.intersections(q)
 }
 
@@ -82,4 +87,52 @@ func lonToUint32(c float64) uint64 {
 // ensure the limit is within -90.0, 90.0
 func latToUint32(c float64) uint64 {
 	return uint64(float64(dim) * ((c + 90.0) / 180.0))
+}
+
+// from http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates#Latitude
+func rectFromCenter(c Coordinate, meters float64) *customRect {
+
+	c.lat *= radians
+	c.lon *= radians
+
+	r := meters / earthRadius
+
+	minLat := c.lat - r
+	maxLat := c.lat + r
+
+	latT := math.Asin(math.Sin(c.lat) / math.Cos(r))
+	lonΔ := math.Acos((math.Cos(r) - math.Sin(latT)*math.Sin(c.lat)) / (math.Cos(latT) * math.Cos(c.lat)))
+
+	minLon := c.lon - lonΔ
+	maxLon := c.lon + lonΔ
+
+	if maxLat > math.Pi/2 {
+		minLon = -math.Pi
+		maxLat = math.Pi / 2
+		maxLon = math.Pi
+	}
+
+	if minLat < -math.Pi/2 {
+		minLat = -math.Pi / 2
+		minLon = -math.Pi
+		maxLon = math.Pi
+	}
+
+	if minLon < -math.Pi || maxLon > math.Pi {
+		minLon = -math.Pi
+		maxLon = math.Pi
+	}
+
+	minLon = math.Mod(minLon+3*math.Pi, 2*math.Pi) - math.Pi // normalise to -180..+180°
+	maxLon = math.Mod(maxLon+3*math.Pi, 2*math.Pi) - math.Pi
+
+	minLat *= degrees
+	minLon *= degrees
+	maxLat *= degrees
+	maxLon *= degrees
+	lower := Coordinate{lon: minLon, lat: minLat}
+	upper := Coordinate{lon: maxLon, lat: maxLat}
+	poly := NewPoly(lower, upper)
+	return &customRect{polygon: poly, box: poly.computeBox()}
+
 }
