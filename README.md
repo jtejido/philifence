@@ -109,5 +109,4 @@ POST json at http://localhost:8383/road/{name}/add
 5. G-NearestNeighbours.
 6. Data Persistence and Data reload on-start
 7. Scalable, Distributed type ([SD-Rtree](http://cedric.cnam.fr/~dumouza/EnsPubli/icde07.pdf) implem. on Hilbert RTree?).
-8. Temporal (Space-Time) R-tree (Multiversioning nodes)
-9. Tests (Hilbert R-Tree is [tested] though).
+8. Tests.
